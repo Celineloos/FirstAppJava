@@ -40,12 +40,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendMessage(View view) {
+        Intent intent = new Intent(this, ActivityFragments.class);
         EditText editText = (EditText) findViewById(R.id.editText);
         String message = editText.getText().toString();
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, message);
-        sendIntent.setType("text/plain");
-        startActivity(sendIntent);
+        intent.putExtra(EXTRA_MESSAGE, message);
+        startActivity(intent);
+
+//        EditText editText = (EditText) findViewById(R.id.editText);
+//        String message = editText.getText().toString();
+//        Intent sendIntent = new Intent();
+//        sendIntent.setAction(Intent.ACTION_SEND);
+//        sendIntent.putExtra(Intent.EXTRA_TEXT, message);
+//        sendIntent.setType("text/plain");
+//        startActivity(sendIntent);
     }
 }
