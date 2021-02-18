@@ -6,14 +6,6 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/detailFragment"
-        android:name="com.example.firstappjava.DetailFragment"
-        android:layout_width="0px"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/overviewFragment"
-        android:name="com.example.firstappjava.OverviewFragment"
         android:layout_width="0px"
         android:layout_height="match_parent"
         android:layout_weight="1" />
