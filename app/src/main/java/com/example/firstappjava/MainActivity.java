@@ -1,6 +1,7 @@
 package com.example.firstappjava;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -18,6 +19,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceFragment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,19 +39,20 @@ public class MainActivity extends AppCompatActivity implements OverviewFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_service);
+        setContentView(R.layout.activity_settings);
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel(POKEMON_CHANNEL, "Name", NotificationManager.IMPORTANCE_DEFAULT);
-            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            manager.createNotificationChannel(channel);
-        }
-
-        Intent intent = new Intent(this, PokemonService.class);
-        startService(intent);
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+//            NotificationChannel channel = new NotificationChannel(POKEMON_CHANNEL, "Name", NotificationManager.IMPORTANCE_DEFAULT);
+//            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//            manager.createNotificationChannel(channel);
+//        }
+//
+//        Intent intent = new Intent(this, PokemonService.class);
+//        startService(intent);
     }
 
-    BroadcastReceiver receiver = new BroadcastReceiver() {
+    BroadcastReceiver receiver = new BroadcastReceiver()
+    {
         @Override
         public void onReceive(Context context, Intent intent) {
             int favorite = intent.getIntExtra("favorite", 0);
@@ -79,6 +82,11 @@ public class MainActivity extends AppCompatActivity implements OverviewFragment.
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.toolbar_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+        }
+
         if(item.getItemId() == R.id.toolbar_favorite)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -131,19 +139,19 @@ public class MainActivity extends AppCompatActivity implements OverviewFragment.
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        SearchView searchView = (SearchView) menu.findItem(R.id.toolbar_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                setPokemon(query);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
+//        SearchView searchView = (SearchView) menu.findItem(R.id.toolbar_search).getActionView();
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                setPokemon(query);
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                return false;
+//            }
+//        });
 
         return true;
     }
