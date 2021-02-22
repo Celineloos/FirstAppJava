@@ -16,10 +16,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +31,9 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Collections;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements OverviewFragment.OnClickListener {
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
@@ -40,6 +45,8 @@ public class MainActivity extends AppCompatActivity implements OverviewFragment.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        setPokemon();
+
 
 //        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
 //            NotificationChannel channel = new NotificationChannel(POKEMON_CHANNEL, "Name", NotificationManager.IMPORTANCE_DEFAULT);
@@ -50,6 +57,32 @@ public class MainActivity extends AppCompatActivity implements OverviewFragment.
 //        Intent intent = new Intent(this, PokemonService.class);
 //        startService(intent);
     }
+
+    void setPokemon()
+    {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        boolean show = preferences.getBoolean("show", true);
+        String name = preferences.getString("name", "");
+        String pokemon = preferences.getString("pokemon", "");
+        boolean bckgrnd = preferences.getBoolean("background", true);
+
+        Set<String> flipping = preferences.getStringSet("flipping", Collections.<String>emptySet());
+        int icon = getResources().getIdentifier(pokemon, "drawable", getPackageName());
+
+        View view = findViewById(android.R.id.content);
+        view.setAlpha(show ? (float) 1.0 : (float) 0.25);
+
+        TextView textView = (TextView) findViewById(R.id.textViewSetting);
+        textView.setText(name);
+
+        ImageView imageView = (ImageView) findViewById(R.id.imageViewSetting);
+        imageView.setImageResource(icon != 0 ? icon : R.mipmap.ic_launcher);
+        imageView.setBackgroundResource(bckgrnd? android.R.color.darker_gray : android.R.color.transparent);
+        imageView.setScaleX(flipping.contains("horizontal") ? -1 : 1);
+        imageView.setScaleY(flipping.contains("vertical") ? -1 : 1);
+    }
+
 
     BroadcastReceiver receiver = new BroadcastReceiver()
     {
@@ -84,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements OverviewFragment.
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.toolbar_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, 1);
         }
 
         if(item.getItemId() == R.id.toolbar_favorite)
@@ -116,6 +149,12 @@ public class MainActivity extends AppCompatActivity implements OverviewFragment.
             builder.create().show();
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        setPokemon();
     }
 
     @Override
