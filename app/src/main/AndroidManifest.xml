@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.firstappjava">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,6 +11,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FirstAppJava">
+        <receiver android:name=".PokemonWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/pokemon_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".PokemonService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".ServiceActivity" />
         <activity android:name=".DisplayMessageActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />

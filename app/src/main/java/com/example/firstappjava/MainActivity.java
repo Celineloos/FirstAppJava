@@ -7,8 +7,16 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,40 +30,51 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements OverviewFragment.OnClickListener {
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
+    public static final String POKEMON_CHANNEL = "POKEMON_CHANNEL";
 
     FragmentManager manager = getSupportFragmentManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_toolbar);
+        setContentView(R.layout.activity_service);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel(POKEMON_CHANNEL, "Name", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.createNotificationChannel(channel);
+        }
 
-        Spinner spinner = findViewById(R.id.spinner);
-        String[] pokemons = {"Bulbasaur", "Dragonite", "Pikachu"};
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, pokemons);
-        spinner.setAdapter(arrayAdapter);
+        Intent intent = new Intent(this, PokemonService.class);
+        startService(intent);
+    }
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String pokemon = arrayAdapter.getItem(position);
-                setPokemon(pokemon);
-            }
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int favorite = intent.getIntExtra("favorite", 0);
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+            TextView textView = findViewById(R.id.textViewService);
+            ImageView imageView = findViewById(R.id.imageViewService);
 
-            }
-        });
+            textView.setText(PokemonService.getName(favorite));
+            imageView.setImageResource(PokemonService.getIcon(favorite));
+        }
+    };
 
-//        boolean portrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-//        if(portrait){
-//            manager.beginTransaction().add(R.id.container, new OverviewFragment(), "overview").commit();
-//        }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(PokemonService.POKEMON_BROADCAST);
+
+        registerReceiver(receiver, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
     }
 
     @Override
